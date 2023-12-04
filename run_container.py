@@ -11,7 +11,12 @@ if __name__ == "__main__":
         "-c", type=str, help="gripper config file"
     )
     parser.add_argument(
-        "-h", type=str, default="localhost", help="host name or ip-address"
+        "-host", type=str, default="localhost", help="host name or ip-address"
+    )
+    parser.add_argument(
+        "launch_args",
+        nargs=argparse.REMAINDER,
+        help="launch args in ros style e.g. foo:=var",
     )
     args = parser.parse_args()
 
@@ -23,15 +28,15 @@ if __name__ == "__main__":
     docker_run_command = """
         docker run \
             --rm --net=host -it \
-            -v {config_path}:/mnt
+            -v {config_path}:/mnt \
             gpg_ros:latest \
             /bin/bash -i -c \
             "source ~/.bashrc; \
             roscd gpg_ros; \
             rossetip $ROS_IP; rossetmaster {host}; \
-            roslaunch gpg_ros grasp_server.launch config:=/mnt/{config_file}
+            roslaunch gpg_ros grasp_server.launch config:=/mnt/{config_file}"
             """.format(
-        host=args.h,
+        host=args.host,
         config_path=config_path,
         config_file=config_file,
     )

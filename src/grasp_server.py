@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
+import pygpg
+import numpy as np
 import rospy
 import tf2_ros
 import tf2_geometry_msgs
 import transformations as tf
 from geometry_msgs.msg import Pose, PoseStamped
+from gpg_ros.msg import Grasps
 from gpg_ros.srv import GetGrasps, GetGraspsResponse
 
 from grasp_plotter import GraspPlotter
@@ -34,14 +37,14 @@ def matrix_to_pose(matrix):
     quaternion = list(tf.quaternion_from_matrix(matrix))
     pose_list = translation + quaternion[1:] + quaternion[:1]
     # pose_list = translation + quaternion
-    return conv.list_to_pose(pose_list)
+    return list_to_pose(pose_list)
 
 def matrix_to_pose_stamped(matrix, target_frame):
     translation = list(tf.translation_from_matrix(matrix))
     quaternion = list(tf.quaternion_from_matrix(matrix))
     pose_list = translation + quaternion[1:] + quaternion[:1]
     # pose_list = translation + quaternion
-    return conv.list_to_pose_stamped(pose_list, target_frame)
+    return list_to_pose_stamped(pose_list, target_frame)
 
 class GraspPlanner():
 
@@ -133,26 +136,31 @@ class GraspPlanner():
 
             # transform into output_frame
             if in2out is not None:
-                pose_stamped = conv2.matrix_to_pose_stamped(pose, input_frame)
+                pose_stamped = matrix_to_pose_stamped(pose, input_frame)
                 pose_transformed = tf2_geometry_msgs.do_transform_pose(
                     pose_stamped,
                     in2out,
                 )
                 pose_list.append(pose_transformed.pose)
             else:
-                pose_list.append(conv2.matrix_to_pose(pose))
+                pose_list.append(matrix_to_pose(pose))
         return pose_list
 
 
     def handle_grasp_request(self, req):
         points = np.array([(p.x,p.y,p.z) for p in req.points])
-        self.get_grasp_poses(points, req.header.frame_id)
-        return GetGraspsResponse(grasps)
+        grasps = self.get_grasp_poses(points, req.frame_id)
+        grasps_msg = Grasps()
+        grasps_msg.header.frame_id = 'world'
+        grasps_msg.grasps = grasps
+        #float64[] grasp_scores
+
+        return GetGraspsResponse(grasps_msg)
 
 if __name__ == "__main__":
     rospy.init_node('gpg_grasp_server')
     print(rospy.get_param_names())
     grasp_planner = GraspPlanner()
-    s = rospy.Service('grasp_server', GetGrasps, grasp_planner.handle_grasp_request)
+    s = rospy.Service('get_grasps', GetGrasps, grasp_planner.handle_grasp_request)
     print("Ready to generate grasps...")
     rospy.spin()
