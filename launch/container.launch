@@ -1,0 +1,3 @@
+<launch>
+  <node name="gpg_ros_server" pkg="gpg_ros" type="run_container.py" output="screen" args="-h $(optenv ROS_MASTER localhost)" />
+</launch>

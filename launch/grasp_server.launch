@@ -1,0 +1,6 @@
+<launch>
+  <arg name="config" />
+  <node name="gpg_ros_docker" pkg="gpg_ros" type="grasp_server.py" output="screen">
+    <param name="config" value="$(arg config)" />
+  </node>
+</launch>
