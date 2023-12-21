@@ -1,3 +1,3 @@
 std_msgs/Header header
-geometry_msgs/Pose[] grasps
-float64[] grasp_scores
+geometry_msgs/Pose[] poses
+float64[] scores
