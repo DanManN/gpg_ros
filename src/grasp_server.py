@@ -49,7 +49,7 @@ class GraspPlanner():
         colors,  # N x (r,g,b)
         pre_grasp_dist=0.05,
         num_samples=500,
-        visualize=True
+        visualize=True,
         visualize_frame='world',
     ):
         grasps = pygpg.generate_grasps(
