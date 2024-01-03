@@ -1,4 +1,4 @@
 <launch>
-  <arg name="config" />
+  <arg name="config" default="$(find pracsys_vbnpm)/scripts/grasp_planner/robotiq_gripper_params.cfg"/>
   <node name="gpg_ros_server" pkg="gpg_ros" type="run_container.py" output="screen" args="-host $(optenv ROS_MASTER localhost) -c $(arg config)" />
 </launch>

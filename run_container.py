@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # NOTE: please use only standard libraries
+import os
 import argparse
 import subprocess
 from pathlib import Path
@@ -33,9 +34,10 @@ if __name__ == "__main__":
             /bin/bash -i -c \
             "source ~/.bashrc; \
             roscd gpg_ros; \
-            rossetip $ROS_IP; rossetmaster {host}; \
+            export ROS_IP={ip}; export ROS_MASTER={host}; export ROS_MASTER_URI=http://{host}:11311; \
             roslaunch gpg_ros grasp_server.launch config:=/mnt/{config_file}"
             """.format(
+        ip=os.environ['ROS_IP'],
         host=args.host,
         config_path=config_path,
         config_file=config_file,
