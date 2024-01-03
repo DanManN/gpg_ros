@@ -37,7 +37,7 @@ if __name__ == "__main__":
             export ROS_IP={ip}; export ROS_MASTER={host}; export ROS_MASTER_URI=http://{host}:11311; \
             roslaunch gpg_ros grasp_server.launch config:=/mnt/{config_file}"
             """.format(
-        ip=os.environ['ROS_IP'],
+        ip=os.environ['ROS_IP'] if 'ROS_IP' in os.environ else '127.0.0.1',
         host=args.host,
         config_path=config_path,
         config_file=config_file,
