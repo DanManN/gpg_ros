@@ -1,4 +1,5 @@
 geometry_msgs/Point[] points
 std_msgs/ColorRGBA[] colors
+string frame_id
 ---
 gpg_ros/Grasps grasps

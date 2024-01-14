@@ -65,6 +65,7 @@ class GraspPlanner():
             )
 
         pose_list = []
+        score_list = []
         for grasp in grasps:
             if not grasp.is_half_antipodal():
                 continue
@@ -92,15 +93,16 @@ class GraspPlanner():
             )
 
             pose_list.append(matrix_to_pose(pose))
-        return pose_list
+            score_list.append(grasp.get_score())
+        return pose_list, score_list
 
     def handle_grasp_request(self, req):
         points = np.array([(p.x, p.y, p.z) for p in req.points])
         colors = np.array([(c.r, c.g, c.b) for c in req.colors])
-        grasps = self.get_grasp_poses(points, colors)
+        grasps, scores = self.get_grasp_poses(points, colors, visualize_frame=req.frame_id)
         grasps_msg = Grasps()
         grasps_msg.poses = grasps
-        #float64[] scores
+        grasps_msg.scores = scores
 
         return GetGraspsResponse(grasps_msg)
 
