@@ -47,7 +47,6 @@ class GraspPlanner():
         self,
         points,  # N x (x,y,z)
         colors,  # N x (r,g,b)
-        pre_grasp_dist=0.05,
         num_samples=500,
         visualize=True,
         visualize_frame='world',
@@ -74,14 +73,9 @@ class GraspPlanner():
             pose[:3, 0] = grasp.get_grasp_approach()
             pose[:3, 1] = grasp.get_grasp_binormal()
             pose[:3, 2] = grasp.get_grasp_axis()
+            pose[:3, 3] = grasp.get_grasp_bottom()
 
-            # displace position by pre_grasp_dist
-            approach = pose[:3, 0] / np.linalg.norm(pose[:3, 0])
-            displace = self.hand_height - pre_grasp_dist
-            bottom = grasp.get_grasp_bottom() + displace * approach
-            pose[:3, 3] = bottom
-
-            #why do I need this transform?
+            #swap x and z axes
             pose = np.matmul(
                 pose,
                 [
@@ -99,7 +93,9 @@ class GraspPlanner():
     def handle_grasp_request(self, req):
         points = np.array([(p.x, p.y, p.z) for p in req.points])
         colors = np.array([(c.r, c.g, c.b) for c in req.colors])
-        grasps, scores = self.get_grasp_poses(points, colors, visualize_frame=req.frame_id)
+        grasps, scores = self.get_grasp_poses(
+            points, colors, visualize_frame=req.frame_id
+        )
         grasps_msg = Grasps()
         grasps_msg.poses = grasps
         grasps_msg.scores = scores
