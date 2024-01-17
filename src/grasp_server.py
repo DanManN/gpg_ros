@@ -46,7 +46,6 @@ class GraspPlanner():
     def get_grasp_poses(
         self,
         points,  # N x (x,y,z)
-        colors,  # N x (r,g,b)
         num_samples=500,
         visualize=True,
         visualize_frame='world',
@@ -92,9 +91,9 @@ class GraspPlanner():
 
     def handle_grasp_request(self, req):
         points = np.array([(p.x, p.y, p.z) for p in req.points])
-        colors = np.array([(c.r, c.g, c.b) for c in req.colors])
         grasps, scores = self.get_grasp_poses(
-            points, colors, visualize_frame=req.frame_id
+            points,
+            visualize_frame=req.frame_id,
         )
         grasps_msg = Grasps()
         grasps_msg.poses = grasps
